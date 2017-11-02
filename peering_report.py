@@ -1,9 +1,12 @@
-import requests, json, telnetlib, re
+import requests, json, telnetlib, re, requests_cache
 from flask import Flask
 from flask import render_template
 from flask import jsonify
 app = Flask(__name__)
 
+requests_cache.install_cache(backend='memory', expire_after=20000)
+global cache_hits
+cache_hits = []
 @app.route('/<asn>')
 def build(asn):
 	net_data = NetResponse(asn)["data"][0] ## Initial peeringdb API query
@@ -62,7 +65,7 @@ def build(asn):
 		prefix_data_v6[prefix]["ripe_data"] = ripe_data
 		
 	### Render HTML file
-	return render_template('test.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6)
+	return render_template('test.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
 
 @app.route('/pfx/<prefix>')
 def pfx(prefix):
@@ -77,21 +80,25 @@ def pfx(prefix):
 def NetResponse(asn):
 	url = "https://peeringdb.com/api/net?depth=2&asn=%s" % (asn) 	## Depth=2 for full values
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	return json.loads(response.text)
 		
 def IxResponse(ix_id):
 	url = "https://peeringdb.com/api/ix/%s" % (ix_id)
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	return json.loads(response.text)
 
 def OrgResponse(org_id):
 	url = "https://peeringdb.com/api/org/%s" % (org_id)
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	return json.loads(response.text)
 	
 def RipePrefixesV4(asn):
 	url = "https://stat.ripe.net/data/ris-prefixes/data.json?resource=%s&list_prefixes=true" % (asn)
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	data = json.loads(response.text)
 	prefixes = []
 	for prefix in data["data"]["prefixes"]["v4"]["originating"]:
@@ -109,6 +116,7 @@ def RipePrefixesV4(asn):
 def RipePrefixesV6(asn):
 	url = "https://stat.ripe.net/data/ris-prefixes/data.json?resource=%s&list_prefixes=true" % (asn)
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	data = json.loads(response.text)
 	prefixes = []
 	for prefix in data["data"]["prefixes"]["v6"]["originating"]:
@@ -158,6 +166,7 @@ def RouteServer(asn, prefix, provider, proto):
 def RipeBgp(asn, prefix):
 	url = "https://stat.ripe.net/data/looking-glass/data.json?resource=%s" % (prefix)
 	response = requests.request("GET", url)
+	cache_hits.append(response.from_cache)
 	data = json.loads(response.text)
 	data1 = data["data"]["rrcs"]
 	prefix_data = {}
