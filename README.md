@@ -10,7 +10,8 @@ The tool is also integrated with Level3's and Hurricane Electric's public route-
     git clone https://github.com/foobarash/peering_report.git
     cd peering_report
     pip install -r requirements.txt
-    python peering_report.py # run on http://127.0.0.1:5000
+    export FLASK_APP=peering_report.py 
+    flask run # run on http://127.0.0.1:5000
 
 # How run the report?
  Use a web-browser to access the endpoint and provide $ASN as the top level argument in the URL 
