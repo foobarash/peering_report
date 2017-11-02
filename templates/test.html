@@ -22,7 +22,7 @@
 <hr />
 {% endfor %}
 {% for key, value in prefix_data.items() %}
-<p style="text-align: center;"><strong><a href="http://127.0.0.1:5000/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
+<p style="text-align: center;"><strong><a href="/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
 AS hops from Level3 : [{% for as in value["level3_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
 AS hops from Hurricane Electric : [{% for as in value["he_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
 {% for k, val in value["ripe_data"].items() %}
@@ -31,7 +31,7 @@ AS hops from RIPE {{ k }} : [{% for as in val["as_path"] %} <a title="IANA-RSVD 
 <p>&nbsp;</p>
 {% endfor %}
 {% for key, value in prefix_data_v6.items() %}
-<p style="text-align: center;"><strong><a href="http://127.0.0.1:5000/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
+<p style="text-align: center;"><strong><a href="/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
 AS hops from Level3 : [{% for as in value["level3_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
 AS hops from Hurricane Electric : [{% for as in value["he_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
 {% for k, val in value["ripe_data"].items() %}
