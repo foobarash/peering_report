@@ -3,12 +3,16 @@ from flask import Flask
 from flask import render_template
 from flask import jsonify
 app = Flask(__name__)
+import redis
 
-requests_cache.install_cache(backend='memory', expire_after=20000)
-global cache_hits
-cache_hits = []
+requests_cache.install_cache(backend='redis', connection = redis.StrictRedis(host='redis-elasticache.kmicv5.0001.euw1.cache.amazonaws.com', port=6379, db=0))
+
 @app.route('/<asn>')
 def build(asn):
+	if 'cache_hits' in globals():
+		del cache_hits
+	global cache_hits
+	cache_hits = []
 	net_data = NetResponse(asn)["data"][0] ## Initial peeringdb API query
 	netfac_set = net_data["netfac_set"]
 	netixlan_set = net_data["netixlan_set"]
@@ -192,5 +196,7 @@ def TelnetCmdOutput(host, cmd):
 	tn.write("terminal length 0\r")
 	tn.write(cmd + "\r\r")
 	tn.write("eof\r")
-	return tn.read_until("eof")
+	output = tn.read_until("eof")
+	tn.close()
+	return output
 	
