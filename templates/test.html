@@ -1,0 +1,45 @@
+<!-- #######  YAY, I AM THE SOURCE EDITOR! #########-->
+<h1 style="color: #5e9ca0; text-align: center;">AS {{ net_data['asn'] }}</h1>
+<h2 style="color: #5e9ca0; text-align: center;"><span style="color: #ff9900;">{{ net_data['name'] }}<br /><span style="color: #99cc00;">Aka {{ net_data['aka'] }}</span></span></h2>
+<p style="text-align: center;">&nbsp;</p>
+<h2 style="color: #2e6c80; text-align: center;">Is present at the following Internet Exchange Points:</h2>
+{% for ixp_dict in ixps %}
+<p style="text-align: center;"><strong>{{ ixp_dict['name_long'] }}</strong><br />Region: {{ ixp_dict['region_continent'] }}<br />City: {{ ixp_dict['city'] }}<br />Bandwidth: {{ ixp_dict['bandwidth'] }}Gbps<br />IPv4 Address: {{ ixp_dict['ipaddr4'] }}<br />IPv6 Address: {{ ixp_dict['ipaddr6'] }}</p>
+<p>&nbsp;</p>
+{% endfor %}
+<br />
+<hr />
+<p style="text-align: center;">&nbsp;<strong>Total IX connections: <span style="color: #99cc00;">{{ total_connections }}<br /><span style="color: #000000;">Aggregate bandwidth: <span style="color: #ff0000;">{{ aggr_bw }}</span>Gbps</span><br /></span></strong></p>
+{% for key, value in regions.items() %}
+<p style="text-align: center;"><strong>{{ key }}<br /></strong>Connections: <span style="color: #99cc00;">{{ value["connections"] }}<br /><span style="color: #000000;">Aggregate bandwidth: <span style="color: #ff0000;">{{ value["bandwidth"] }}</span>Gbps</span></span></p>
+{% endfor %}
+<br />
+<hr />
+<h2 style="color: #2e6c80; text-align: center;">Interconnects with following Organizations:</h2><br />
+{% for org_dict in unique_orgs %}
+<p style="text-align: center;"><strong>{{ org_dict['name'] }}</strong><br /><a href="{{ org_dict['website'] }}">{{ org_dict['website'] }}</a></p>
+<p>&nbsp;</p>
+<hr />
+{% endfor %}
+{% for key, value in prefix_data.items() %}
+<p style="text-align: center;"><strong><a href="http://127.0.0.1:5000/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
+AS hops from Level3 : [{% for as in value["level3_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+AS hops from Hurricane Electric : [{% for as in value["he_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+{% for k, val in value["ripe_data"].items() %}
+AS hops from RIPE {{ k }} : [{% for as in val["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+{% endfor %}
+<p>&nbsp;</p>
+{% endfor %}
+{% for key, value in prefix_data_v6.items() %}
+<p style="text-align: center;"><strong><a href="http://127.0.0.1:5000/pfx/{{ key | replace("/", "&") }}">{{ key }}</a></strong><br />
+AS hops from Level3 : [{% for as in value["level3_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+AS hops from Hurricane Electric : [{% for as in value["he_data"]["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+{% for k, val in value["ripe_data"].items() %}
+AS hops from RIPE {{ k }} : [{% for as in val["as_path"] %} <a title="IANA-RSVD (ARIN)" href="https://whois.arin.net/rest/asn/AS{{ as }}" target="_lookup">{{ as }},</a>{% endfor %}]<br />
+{% endfor %}
+<p>&nbsp;</p>
+{% endfor %}
+
+{{ net_data|pprint }}
+{{ prefix_data|pprint }}
+{{ prefix_data_v6|pprint }}
