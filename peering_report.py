@@ -127,7 +127,7 @@ def RouteServer(asn, prefix, provider, proto):
 	if provider=='HE':
 		host = "route-server.he.net"
 	prefix_data = {prefix:{}}
-	if proto=="IPv6" and int((prefix.split("/")[1])) > 44: ## Don't lookup prefixes longer than /44
+	if proto=="IPv6" and int((prefix.split("/")[1])) > 48: ## Don't lookup prefixes longer than /48
 		return prefix_data
 	output = TelnetCmdOutput(host, cmd)
 	prefix_data[prefix]["output"] = output
