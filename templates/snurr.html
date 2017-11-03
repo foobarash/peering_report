@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<script src="/static/handsontable.js"></script>
+<link rel="stylesheet" media="screen" href="/static/handsontable.css">
+</head>
+<body>
+<h1 style="color: #5e9ca0;">AS {{ net_data['asn'] }}</h1>
+<h2 style="color: #5e9ca0;"><span style="color: #ff9900;">{{ net_data['name'] }}<br /><span style="color: #99cc00;">Aka {{ net_data['aka'] }}</span></span></h2>
+<h2 style="color: #2e6c80;">Is present at the following Internet Exchange Points:</h2>
+<div id="example2"></div>
+<script>
+var data = [
+{% for ixp_dict in ixps %}
+        {
+            name_long: '{{ ixp_dict['name_long'] }}',
+            region_continent: '{{ ixp_dict['region_continent'] }}',
+            city: '{{ ixp_dict['city'] }}',
+            bandwidth: '{{ ixp_dict['bandwidth'] }}',
+            ipaddr4: '{{ ixp_dict['ipaddr4'] }}',
+            ipaddr6: '{{ ixp_dict['ipaddr6'] }}'
+        },
+    ];
+{% endfor %}
+
+var container = document.getElementById('example2');
+var hot = new Handsontable(container, {
+  data: data,
+  rowHeaders: true,
+  colHeaders: ['IXP Name', 'Region', 'City', 'Bandwidth (Gbps)', 'IPv4 Address', 'IPv6 Address']
+});
+</script>
+
+<h2 style="color: #2e6c80;">Is originating the following prefixes:</h2>
+<div id="example"></div>
+<script>var data = [
+{% for key, value in prefix_data.items() %}
+        {
+            prefix: '<a href="/pfx/{{ key | replace("/", "&") }}">{{ key }}</a>',
+            level3_hops: '{{ value['level3_data']['as_path']|join(',') }}',
+            he_hops: '{{ value['he_data']['as_path']|join(',') }}',
+	{% for k, val in value["ripe_data"].items() %}
+		{% if k == "Amsterdam, Netherlands" %}
+			amsterdam: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Frankfurt, Germany" %}
+			frankfurt: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Geneva, Switzerland" %}
+			geneva: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "London, United Kingdom" %}
+			london: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Miami, Florida, US" %}
+			miami: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Sao Paulo, Brazil" %}
+			brazil: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+
+	{% endfor %}
+        },
+{% endfor %}
+{% for key, value in prefix_data_v6.items() %}
+        {
+            prefix: '<a href="/pfx/{{ key | replace("/", "&") }}">{{ key }}</a>',
+            level3_hops: '{{ value['level3_data']['as_path']|join(',') }}',
+            he_hops: '{{ value['he_data']['as_path']|join(',') }}',
+	{% for k, val in value["ripe_data"].items() %}
+		{% if k == "Amsterdam, Netherlands" %}
+			amsterdam: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Frankfurt, Germany" %}
+			frankfurt: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Geneva, Switzerland" %}
+			geneva: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "London, United Kingdom" %}
+			london: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Miami, Florida, US" %}
+			miami: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+		{% if k == "Sao Paulo, Brazil" %}
+			brazil: '{{ val["as_path"]|join(',') }}',
+		{% endif %}
+
+	{% endfor %}
+        },
+{% endfor %}
+    ];
+var container = document.getElementById('example');
+var hot = new Handsontable(container, {
+  data: data,
+  rowHeaders: true,
+  colHeaders: ['Prefix', 'AS Path Level3', 'AS Path HE', ' HE Hop count', "Amsterdam, Netherlands", "Frankfurt, Germany", "Geneva, Switzerland", "London, United Kingdom", "Miami, Florida, US", "Sao Paulo, Brazil"],
+    columns: [
+      {data: "prefix", renderer: "html"},
+      {data: "level3_hops", renderer: "text"},
+      {data: "he_hops", renderer: "text"},
+      {data: "he_hops_to_origin", renderer: "text"},
+      {data: "amsterdam", renderer: "text"},
+      {data: "frankfurt", renderer: "text"},
+      {data: "geneva", renderer: "text"},
+      {data: "london", renderer: "text"},
+      {data: "miami", renderer: "text"},
+      {data: "brazil", renderer: "text"}
+
+
+
+    ]
+});
+</script>
+</body>
+</html>
