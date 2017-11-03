@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href="/static/handsontable.full.min.css">
+<link rel="stylesheet" type="text/css" href="/static/main.css">
+<script src="/static/handsontable.full.min.js"></script>
+
+</head>
+<body>
+<div id="example"></div>
+<script>var data = [
+        {
+            prefix: '185.25.44.0/24',
+            as_hops: '1299 60205',
+            hops_to_origin: '2'
+        },
+        {
+            prefix: '185.25.45.0/24',
+            as_hops: '1299 60205',
+            hops_to_origin: '2'
+        }
+    ];
+var container = document.getElementById('example');
+var hot = new Handsontable(container, {
+  data: data,
+  rowHeaders: true,
+  colHeaders: ['Prefix', 'AS hops', 'Hop count']
+});
+</script>
+</body>
+</html>
+

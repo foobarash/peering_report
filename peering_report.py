@@ -3,10 +3,10 @@ from flask import Flask
 from flask import render_template
 from flask import jsonify
 app = Flask(__name__)
-import redis
+#import redis
 
-requests_cache.install_cache(backend='redis', connection = redis.StrictRedis(host='redis-elasticache.kmicv5.0001.euw1.cache.amazonaws.com', port=6379, db=0))
-
+#equests_cache.install_cache(backend='redis', connection = redis.StrictRedis(host='redis-elasticache.kmicv5.0001.euw1.cache.amazonaws.com', port=6379, db=0))
+requests_cache.install_cache(backend='memory')
 @app.route('/<asn>')
 def build(asn):
 	if 'cache_hits' in globals():
@@ -69,7 +69,8 @@ def build(asn):
 		prefix_data_v6[prefix]["ripe_data"] = ripe_data
 		
 	### Render HTML file
-	return render_template('test.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
+	#return render_template('test.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
+	return render_template('snurr.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
 
 @app.route('/pfx/<prefix>')
 def pfx(prefix):
