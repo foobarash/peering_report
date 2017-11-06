@@ -1,12 +1,13 @@
-import requests, json, telnetlib, re, requests_cache
+import requests, json, telnetlib, re, requests_cache, datetime 
 from flask import Flask
 from flask import render_template
 from flask import jsonify
-app = Flask(__name__)
-#import redis
-
-#equests_cache.install_cache(backend='redis', connection = redis.StrictRedis(host='redis-elasticache.kmicv5.0001.euw1.cache.amazonaws.com', port=6379, db=0))
-requests_cache.install_cache(backend='memory')
+app = Flask(__name__, template_folder='static')
+import redis
+global log_file
+log_file = open('log.txt', 'w')
+requests_cache.install_cache(backend='redis', connection = redis.StrictRedis(host='redis-elasticache.kmicv5.0001.euw1.cache.amazonaws.com', port=6379, db=0))
+#requests_cache.install_cache(backend='memory')
 @app.route('/<asn>')
 def build(asn):
 	if 'cache_hits' in globals():
@@ -21,6 +22,7 @@ def build(asn):
  	orgs = []
  	ixps = []
  	### Loop through IX LANs associated with the ASN 
+	log_file.write(str(datetime.datetime.now()) + " Initiating IX LAN for " + asn + "\r")
 	for i in netixlan_set:	
 		ix_data = IxResponse(i["ix_id"])["data"][0]
 		org_id = ix_data["org_id"]
@@ -41,7 +43,7 @@ def build(asn):
 		regions[region]["connections"] += 1
 	## Build dict with unique values
 	unique_orgs = {v['id']:v for v in orgs}.values()
-	
+       	log_file.write(str(datetime.datetime.now()) + " Done with IX LAN for " + asn + "\r")
 	### Build IPv4 Prefix Data
 	originated_prefixes_v4 = RipePrefixesV4(asn) ## Fetch IPv4 prefixes originated from given ASN
 	global prefix_data
@@ -54,7 +56,7 @@ def build(asn):
 		prefix_data[prefix]["level3_data"] = level3_data[prefix]
 		prefix_data[prefix]["he_data"] = he_data[prefix]
 		prefix_data[prefix]["ripe_data"] = ripe_data
-
+       	log_file.write(str(datetime.datetime.now()) + " Done with IPv4 for " + asn + "\r")
 	### Build IPv6 Prefix Data
 	originated_prefixes_v6 = RipePrefixesV6(asn) ## Fetch IPv6 prefixes originated from given ASN
 	global prefix_data_v6
@@ -67,8 +69,9 @@ def build(asn):
 		prefix_data_v6[prefix]["level3_data"] = level3_data[prefix]
 		prefix_data_v6[prefix]["he_data"] = he_data[prefix]
 		prefix_data_v6[prefix]["ripe_data"] = ripe_data
-		
+       	log_file.write(str(datetime.datetime.now()) + " Done with IPv6 for " + asn + "\r")
 	### Render HTML file
+       	log_file.write(str(datetime.datetime.now()) + " Returned " + asn + "\r")
 	#return render_template('test.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
 	return render_template('snurr.html', net_data = net_data, ixps = ixps, unique_orgs = unique_orgs, regions = regions, total_connections = len(ixps), aggr_bw = aggr_bw, prefix_data = prefix_data, prefix_data_v6 = prefix_data_v6, cache_hits = cache_hits)
 
